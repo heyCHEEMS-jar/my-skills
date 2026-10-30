@@ -1,8 +1,6 @@
 # concise-typescript-style
 
-<div align="center">
-<img alt="Tests: not run" src="https://img.shields.io/badge/tests-not_run-lightgrey"> <img alt="License: ISC" src="https://img.shields.io/badge/license-ISC-blue"> <img alt="Version: unspecified" src="https://img.shields.io/badge/version-unspecified-lightgrey"> <img alt="Language: TypeScript / JavaScript" src="https://img.shields.io/badge/language-TypeScript%20%2F%20JavaScript-blue">
-</div>
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)
 
 ## 简介
 
