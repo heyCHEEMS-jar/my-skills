@@ -3,20 +3,38 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "用简洁的 TypeScript 风格精简下面的包装函数，少定义不必要的变量，不新增工具函数或类。假设 request 已定义，其 method 参数支持 GET。只给改后的代码。\n\nexport const getData = async (url: string) => {\n  const options = { url, method: 'GET' as const }\n  const result = await request(options)\n  return result\n}",
+      "prompt": "用简洁的 TypeScript 风格精简下面的包装函数，少定义不必要的变量，不新增工具函数或类。假设 request 已定义，其 method 参数支持 GET，返回 Promise 且不会同步抛错。只给改后的代码。\n\nexport const getData = async (url: string) => {\n  const options = { url, method: 'GET' as const }\n  const result = await request(options)\n  return result\n}",
       "expected_output": "直接返回 request({ url, method: 'GET' }) 的导出箭头函数；去掉仅用于转交的 options 和 result，不新增抽象。单引号、无分号，并保留参数类型。",
       "files": []
     },
     {
       "id": 2,
       "prompt": "这段异步逻辑写得再简洁一点，少几个中间变量。假设 waitForResponse、startOperation 和 saveToken 已定义；waitForResponse 会立即注册响应监听，外层还有释放资源的 try/finally，不要修改它。保留先监听再触发操作的顺序、错误消息、JSON 解析的错误边界和 token 校验。只给改后的代码。\n\nconst responsePromise = waitForResponse()\nawait startOperation()\nconst response = await responsePromise.catch(() => {\n  throw new Error('Operation was cancelled or timed out')\n})\nconst result = (await response.json()) as { token?: unknown }\nif (typeof result.token !== 'string' || !result.token) {\n  throw new Error('No valid token was returned')\n}\nawait saveToken(result.token)\nreturn result.token",
-      "expected_output": "直接解构 token，移除没有独立用途的中间对象，仍对 token 做字符串和非空校验。保留提前创建的 responsePromise，且不会用等待响应的 catch 捕获 JSON 解析失败；不删除外层资源清理。",
+      "expected_output": "直接解构 token，减少中间对象访问，仍对 token 做字符串和非空校验。保留提前创建的 responsePromise；可以保留 res 命名等待响应的步骤，再用 await 解析 JSON，不为了少变量嵌套 await 或串成长链。等待响应的 catch 不捕获 JSON 解析失败，不删除外层资源清理。",
       "files": []
     },
     {
       "id": 3,
       "prompt": "检查这段工具代码是否值得为了减少变量而精简。假设 load、equal、prepare 和 save 已存在，保存前必须完成 prepare；返回值会用于决定调用方是否刷新界面。不要改代码，只简短说明。\n\nexport const saveIfChanged = async (key: string, content: Uint8Array) => {\n  const previous = await load(key)\n  if (equal(previous, content)) return false\n  await prepare(key, previous)\n  await save(key, content)\n  return true\n}",
       "expected_output": "说明这段代码已经简洁，previous 有复用职责应保留，早返回及布尔返回值有意义；不建议重复读取旧值、不把有依赖的准备与保存改成 Promise.all、不新增封装。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "这段 TS 工具代码可以再简洁点吗？按我的手写习惯来，不要追求一行写完。假设 openDB 已定义并返回数据库实例，getById 返回 Promise，content 的空值回退语义不变。只简短说明是否要改，并给你推荐的代码。\n\n// 获取缓存内容\nexport const getCache = async (id: string) => {\n  const db = await openDB('content')\n  const res = await db.getById(id)\n  return res?.content || ''\n}",
+      "expected_output": "认可当前代码已经直接；保留短中文功能注释，以及命名获取数据库、读取记录两个步骤的 db 和 res。不把两步改成嵌套 await 或长 then 链，也不新增工厂、接口层或类型体操。",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "保持普通函数组件的风格，把这个 React 表单补成不会因节流跳过提交回调而刷新页面的写法，简单直接即可。假设 React 与 throttledSubmit 已定义，throttledSubmit 是稳定的业务节流函数，冷却期内会直接返回，不负责阻止表单默认提交；不要修改它，也不要新增 Hook。只给改后的 TSX。\n\nexport default function Login() {\n  return (\n    <form onSubmit={throttledSubmit}>\n      <button type=\"submit\">登录</button>\n    </form>\n  )\n}",
+      "expected_output": "保留 export default function Login，用就地 onSubmit 箭头回调先调用 e.preventDefault() 再调用 throttledSubmit(e)。不把 preventDefault 放到可能被节流跳过的业务里，不额外套 React.FC、useCallback 或自定义 Hook；模板属性使用双引号。",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "按简洁手写风格看看下面这个 TS EventBus 是否需要换一种封装。不要改行为，尤其是回调身份、取消订阅和链式返回；不改代码，只简短说明。\n\nclass EventBus {\n  private events = new Map<string, (() => void)[]>()\n\n  on(key: string, func: () => void) {\n    if (!this.events.has(key)) this.events.set(key, [])\n    this.events.get(key)!.push(func)\n    return this\n  }\n\n  emit(key: string) {\n    this.events.get(key)?.forEach((func) => func())\n    return this\n  }\n\n  off(key: string, func: () => void) {\n    const funcs = this.events.get(key)\n    if (funcs) this.events.set(key, funcs.filter((f) => f !== func))\n    return this\n  }\n}",
+      "expected_output": "说明简单类适合把事件状态和相关操作组织在一起，无需强行函数式改写或增加工厂、策略、接口层。保留原生 Map、回调引用、数组订阅语义和 return this；不以禁止类或减少所有变量作为简洁标准。",
       "files": []
     }
   ]

@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"C:/Users/Administrator/.claude/skills/senior-engineer-mentor/scripts/session-start.cjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
