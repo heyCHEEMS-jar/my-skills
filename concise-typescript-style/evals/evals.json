@@ -36,6 +36,12 @@
       "prompt": "按简洁手写风格看看下面这个 TS EventBus 是否需要换一种封装。不要改行为，尤其是回调身份、取消订阅和链式返回；不改代码，只简短说明。\n\nclass EventBus {\n  private events = new Map<string, (() => void)[]>()\n\n  on(key: string, func: () => void) {\n    if (!this.events.has(key)) this.events.set(key, [])\n    this.events.get(key)!.push(func)\n    return this\n  }\n\n  emit(key: string) {\n    this.events.get(key)?.forEach((func) => func())\n    return this\n  }\n\n  off(key: string, func: () => void) {\n    const funcs = this.events.get(key)\n    if (funcs) this.events.set(key, funcs.filter((f) => f !== func))\n    return this\n  }\n}",
       "expected_output": "说明简单类适合把事件状态和相关操作组织在一起，无需强行函数式改写或增加工厂、策略、接口层。保留原生 Map、回调引用、数组订阅语义和 return this；不以禁止类或减少所有变量作为简洁标准。",
       "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "项目在组件领域已经采用 comp/comps 缩写。请按简洁手写风格统一下面代码及其导入、调用方中的内部命名，但不要改变配置键、用户文案和文件路径。只简短说明应该怎样改。\n\nconst componentFilesKey = 'componentFiles'\nexport const getComponentFiles = () => config.get(componentFilesKey)\nexport const fetchComponents = async () => {\n  const components = await request('/components')\n  showInformationMessage('Loaded components')\n  return components\n}",
+      "expected_output": "内部标识符统一改为 compFilesKey、getCompFiles、fetchComps 和 comps，并同步所有导入与调用方；不要只改局部变量而留下 Component/Components 混用。保留外部配置键 'componentFiles'、请求路径 '/components' 和用户文案 'Loaded components'，除非用户明确要求修改这些外部契约或可见内容。",
+      "files": []
     }
   ]
 }
