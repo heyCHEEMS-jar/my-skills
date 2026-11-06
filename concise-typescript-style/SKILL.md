@@ -46,7 +46,8 @@ description: >-
 - 两空格是没有配置时的回退，不把 Tab 缩进的项目改成空格，也不逐字模仿博客代码块中不统一的排版。
 - 文件名沿用同目录习惯，避免为统一命名改动无关文件。
 - `ctx`、`res`、`db`、`req`、`dir`、`uri` 等上下文明确的短名可以保留；领域清楚时，`app`、`comp`、`apps`、`comps`、`curApp`、`curComp` 这类短缩写也可以直接使用，不机械扩成长名称。循环、索引和算法中的 `i`、`j`、`l`、`r` 也很自然。其他领域状态用 `loading`、`timer`、`visibleMap` 这类直接名称。
-- 领域缩写一旦选定，应贯穿同一概念的内部标识符：例如统一使用 `Comp`、`CompListResponse`、`compFiles`、`getCompFile`、`fetchComps`，并同步导入和调用方，不只缩写参数或局部变量而留下 `getComponentFile`、`fetchComponents` 等混用。改名前先区分内部命名与外部契约；用户文案、配置或序列化键、接口字段、命令 ID、URL 和文件路径等不因代码缩写自动改写，除非用户明确要求。
+- 领域缩写一旦选定，应贯穿同一概念的内部标识符：例如统一使用 `Comp`、`CompListResponse`、`compFiles`、`getCompFile`、`fetchComps`，并同步导入和调用方，不只缩写参数或局部变量而留下 `getComponentFile`、`fetchComponents` 等混用。
+- 内部缩写不向公开契约扩散。`package.json` 等清单中暴露给用户的配置名称、命令 ID，以及 API 字段、序列化键、存储键等跨边界名称，默认使用 `component`、`components` 这类完整且清晰的单词；内部可写成 `const compFilesKey = 'componentFiles'`。已有外部名称不为统一内部风格而改动，除非用户明确要求并接受兼容影响。用户文案、URL 和文件路径也不按代码标识符规则替换。
 - 常量按现有约定命名，不是所有 `const` 都写成大写。
 - 保持现有导入顺序和模块形式。新模块在环境支持时优先 ESM，不为了风格迁移已有 CommonJS 模块。
 - 注释保持周围代码的语言；没有约定时使用简短中文。函数前的“防抖”“获取文章”、步骤前的“初始化”“清空缓存”等短功能注释可以保留；关键状态旁解释用途或原因，不给每次普通赋值都写注释。

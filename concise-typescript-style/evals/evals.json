@@ -39,8 +39,8 @@
     },
     {
       "id": 7,
-      "prompt": "项目在组件领域已经采用 comp/comps 缩写。请按简洁手写风格统一下面代码及其导入、调用方中的内部命名，但不要改变配置键、用户文案和文件路径。只简短说明应该怎样改。\n\nconst componentFilesKey = 'componentFiles'\nexport const getComponentFiles = () => config.get(componentFilesKey)\nexport const fetchComponents = async () => {\n  const components = await request('/components')\n  showInformationMessage('Loaded components')\n  return components\n}",
-      "expected_output": "内部标识符统一改为 compFilesKey、getCompFiles、fetchComps 和 comps，并同步所有导入与调用方；不要只改局部变量而留下 Component/Components 混用。保留外部配置键 'componentFiles'、请求路径 '/components' 和用户文案 'Loaded components'，除非用户明确要求修改这些外部契约或可见内容。",
+      "prompt": "项目在组件领域已经采用 comp/comps 缩写。请按简洁手写风格统一下面代码及其导入、调用方中的内部命名。package.json 中配置项名称会展示给用户并作为稳定配置 API；不要改变公开配置名、命令 ID、接口字段、用户文案和文件路径。只简短说明应该怎样改。\n\nconst componentFilesKey = 'componentFiles'\nexport const getComponentFiles = () => config.get(componentFilesKey)\nexport const fetchComponents = async () => {\n  const components = await request('/components')\n  showInformationMessage('Loaded components')\n  return components\n}\n\npackage.json:\n{ \"contributes\": { \"configuration\": { \"properties\": { \"componentFiles\": {} } } }, \"commands\": [{ \"command\": \"extension.selectComponent\" }] }",
+      "expected_output": "内部标识符统一改为 compFilesKey、getCompFiles、fetchComps 和 comps，并同步所有导入与调用方；形成 const compFilesKey = 'componentFiles' 这种清楚的边界。保留公开配置名 'componentFiles'、命令 ID 'extension.selectComponent'、请求路径 '/components' 和用户文案 'Loaded components'，不要让内部缩写扩散到公共契约。",
       "files": []
     }
   ]
