@@ -42,6 +42,12 @@
       "prompt": "项目在组件领域已经采用 comp/comps 缩写。请按简洁手写风格统一下面代码及其导入、调用方中的内部命名。package.json 中配置项名称会展示给用户并作为稳定配置 API；不要改变公开配置名、命令 ID、接口字段、用户文案和文件路径。只简短说明应该怎样改。\n\nconst componentFilesKey = 'componentFiles'\nexport const getComponentFiles = () => config.get(componentFilesKey)\nexport const fetchComponents = async () => {\n  const components = await request('/components')\n  showInformationMessage('Loaded components')\n  return components\n}\n\npackage.json:\n{ \"contributes\": { \"configuration\": { \"properties\": { \"componentFiles\": {} } } }, \"commands\": [{ \"command\": \"extension.selectComponent\" }] }",
       "expected_output": "内部标识符统一改为 compFilesKey、getCompFiles、fetchComps 和 comps，并同步所有导入与调用方；形成 const compFilesKey = 'componentFiles' 这种清楚的边界。保留公开配置名 'componentFiles'、命令 ID 'extension.selectComponent'、请求路径 '/components' 和用户文案 'Loaded components'，不要让内部缩写扩散到公共契约。",
       "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "这段历史记录工具缺少必要注释，请补一下，保持简单直接。只调整注释，不改变逻辑、标识符或代码结构，只给代码。\n\nconst history: string[] = []\nconst maxSize = 30\n\nexport const addHistory = (value: string) => {\n  if (history.length >= maxSize) history.shift()\n  history.push(value)\n}",
+      "expected_output": "使用简短中文 // 注释，// 后留一个空格。maxSize 可用行尾注释解释容量，代码与 // 之间留一个空格；函数前可用独立注释说明添加历史记录，容量分支前说明先移除旧记录以免添加后超限，独立注释与对应代码缩进一致且不隔空行。不为 history.push 等清楚语句逐行复述，不生成英文、块注释、JSDoc、@param 或 @returns 模板，不改变代码逻辑、标识符或结构。",
+      "files": []
     }
   ]
 }
