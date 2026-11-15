@@ -233,6 +233,48 @@ export const addHistory = (value: string) => {
 - 有价值的短中文注释应保留；逻辑变化时同步修正，不为了压缩行数删除。允许混写实际标识符，不强行把变量名翻译成长中文。
 - 普通逻辑不默认使用英文或块注释。明确要求的接口文档和工具链注释，以及 JSX 标记内部的语法限制，按对应规范处理，不能据此给普通业务代码套文档模板。
 
+## 9. 独立异步操作用 Promise.all，有依赖的步骤仍顺序执行
+
+假设两份数据互不依赖、都必须读取成功，且接口允许并发。
+
+改前：
+
+```ts
+const profile = await loadProfile(userId)
+const preferences = await loadPreferences(userId)
+return { profile, preferences }
+```
+
+改后：
+
+```ts
+const [profile, preferences] = await Promise.all([loadProfile(userId), loadPreferences(userId)])
+return { profile, preferences }
+```
+
+不要仅因为代码写成了多行，就让独立请求串行等待；也不为几次请求新建任务调度器或 Promise 包装函数。
+
+反例：以下业务明确要求先通过账号校验，再保存账号，保存成功后才能签发会话，因此不能并发。
+
+```ts
+const account = await validateAccount(input)
+await saveAccount(account)
+return createSession(account.id)
+```
+
+- 并发前确认结果、权限、事务和外部副作用之间没有依赖；同一数据库连接的顺序命令不能靠 `Promise.all` 变成安全并发。
+- `Promise.all` 有一个任务失败时不会取消其他任务；不能提前释放仍被使用的资源。需要等所有任务结束并分别处理成功或失败时，再用 `Promise.allSettled`，不默认吞掉错误。
+- 大批量操作遵循已有并发上限；同步逻辑和 React 状态更新不包装成 Promise。
+
+## 10. 未主动要求验证，就不运行检查或测试
+
+- 用户说“帮我修一下登录弹窗”：只读取必要文件并完成修改，不自行运行类型检查、lint、构建、测试或 IDE 诊断。
+- 用户说“补一个退出登录的测试”：编写测试代码，但不默认执行测试。
+- 用户说“改完运行退出登录测试”：执行要求的测试，不顺带跑全量测试、构建或启动浏览器。
+- 用户说“验证这个 Skill 的效果”：才使用对应评估材料，不在普通编码任务中主动运行 Skill 评估。
+
+未运行时如实说明“未运行验证或测试”；不能把保存文件、静态阅读或工具自动返回的诊断称为运行验证通过，也不通过其他工具、代理或后台任务绕过授权。
+
 ## 不要机械套用
 
 - 偏好箭头函数，不意味着替换依赖动态 `this` 或声明提升的函数。
